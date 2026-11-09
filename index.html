@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafios de Especificação de Robôs — Introdução a Robótica</title>
+<style>
+  :root{
+    --bg:#0d1b2a; --panel:#13263a; --panel2:#1b3350; --line:#2c4a6e;
+    --txt:#e8eef5; --dim:#9fb3c8; --accent:#ff9e1b; --teal:#35d0ba;
+    --good:#4ade80; --bad:#f87171; --gold:#ffc97a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--txt); font-family:'Segoe UI',Arial,sans-serif; min-height:100vh;}
+  h1,h2{font-weight:700;}
+  /* ============ login ============ */
+  #vLogin{display:flex; align-items:center; justify-content:center; min-height:100vh;}
+  .login-box{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:36px; width:400px; max-width:92vw;}
+  .login-box .tag{background:var(--accent); color:#1a1206; font-weight:700; font-size:.72rem; padding:4px 12px; border-radius:20px; display:inline-block; margin-bottom:14px;}
+  .login-box h1{font-size:1.35rem; margin-bottom:6px;}
+  .login-box p{font-size:.86rem; color:var(--dim); line-height:1.5; margin-bottom:18px;}
+  .login-box input{width:100%; background:var(--panel2); border:1px solid var(--line); border-radius:10px;
+    color:var(--txt); font-size:1.05rem; padding:12px 14px; outline:none; margin-bottom:12px;}
+  .login-box input:focus{border-color:var(--accent);}
+  .btn{display:inline-block; background:var(--accent); color:#1a1206; border:none; padding:11px 18px;
+    border-radius:10px; font-weight:700; font-size:.9rem; cursor:pointer; margin:4px 6px 4px 0;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:var(--panel2); color:var(--txt); border:1px solid var(--line);}
+  .btn.big{width:100%; padding:13px;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  /* ============ header ============ */
+  header{display:flex; align-items:center; gap:12px; padding:10px 18px; background:var(--panel); border-bottom:2px solid var(--accent); flex-wrap:wrap;}
+  header .tag{background:var(--accent); color:#1a1206; font-weight:700; font-size:.7rem; padding:4px 10px; border-radius:20px;}
+  header h1{font-size:1rem;}
+  header .user{margin-left:auto; display:flex; align-items:center; gap:10px; font-size:.85rem;}
+  header .xp{color:var(--accent); font-weight:700;}
+  header .avatar{width:32px; height:32px; border-radius:50%; background:var(--teal); color:#08243b;
+    display:flex; align-items:center; justify-content:center; font-weight:700;}
+  /* ============ layout ============ */
+  main{max-width:1080px; margin:0 auto; padding:22px 18px 60px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px;}
+  .card h3{font-size:1rem; margin-bottom:6px;}
+  .card p{font-size:.85rem; color:var(--dim); line-height:1.5;}
+  .card .bar{height:8px; background:var(--panel2); border-radius:6px; margin:12px 0 6px; overflow:hidden;}
+  .card .bar i{display:block; height:100%; background:var(--teal); border-radius:6px;}
+  .card .st{font-size:.75rem; color:var(--dim);}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .badge{font-size:.72rem; background:var(--panel2); border:1px solid var(--line); color:var(--dim);
+    padding:4px 10px; border-radius:20px;}
+  .badge.on{background:#2d1c05; border-color:var(--accent); color:var(--accent); font-weight:700;}
+  .banner{background:var(--panel2); border-left:3px solid var(--accent); border-radius:0 10px 10px 0;
+    padding:10px 14px; font-size:.83rem; color:var(--dim); line-height:1.5; margin:14px 0;}
+  /* ============ dados/enunciado ============ */
+  .stmt{font-size:.95rem; line-height:1.65; color:var(--txt);}
+  .databox{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin:12px 0;}
+  .databox h4{font-size:.75rem; text-transform:uppercase; letter-spacing:.8px; color:var(--teal); margin-bottom:8px;}
+  .databox li{font-size:.87rem; color:var(--dim); line-height:1.6; margin-left:16px;}
+  .databox b{color:var(--txt);}
+  .faq{font-size:1rem; background:#262f0d; border:1px solid #6f8f1e; color:#e3f0c0; border-radius:10px;
+    padding:12px 16px; margin:14px 0;}
+  /* ============ respostas ============ */
+  .opt{display:flex; gap:10px; background:var(--panel2); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; margin:8px 0; cursor:pointer; font-size:.9rem; line-height:1.45; align-items:flex-start;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.sel{border-color:var(--accent); background:#26324a;}
+  .opt.correct{border-color:var(--good); background:#12301f;}
+  .opt.wrong{border-color:var(--bad); background:#301418;}
+  .opt input{margin-top:3px; accent-color:var(--accent);}
+  .opt .mark{font-weight:700; margin-left:auto; white-space:nowrap;}
+  .fb{background:var(--panel2); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.85rem;
+    color:var(--dim); line-height:1.55; border-left:3px solid var(--line); display:none;}
+  .fb.show{display:block;}
+  .fb b{color:var(--txt);}
+  .fb.ok{border-left-color:var(--good);} .fb.no{border-left-color:var(--bad);}
+  input[type=number],#inpNum{background:var(--panel2); border:1px solid var(--line); border-radius:10px; color:var(--txt);
+    font-size:1.05rem; padding:10px 14px; width:180px; outline:none;}
+  input[type=number]:focus,#inpNum:focus{border-color:var(--accent);}
+  .unit{color:var(--dim); font-size:.9rem; margin-left:8px;}
+  .modal-bg{position:fixed; inset:0; background:rgba(5,10,18,.72); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .modal{background:var(--panel); border:1px solid var(--line); border-radius:14px; max-width:640px; width:100%;
+    max-height:86vh; overflow-y:auto; padding:22px;}
+  aside.drawer{position:fixed; top:0; right:-440px; width:410px; max-width:94vw; height:100vh; background:var(--panel);
+    border-left:1px solid var(--line); z-index:40; transition:right .25s; overflow-y:auto; padding:20px;}
+  aside.drawer.open{right:0;}
+  .robot-card{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:10px 0;}
+  .robot-card h4{color:var(--accent); font-size:.92rem;}
+  .robot-card table{width:100%; font-size:.8rem; color:var(--dim); border-collapse:collapse; margin-top:6px;}
+  .robot-card td{padding:2px 0;} .robot-card td:last-child{text-align:right; color:var(--txt); font-weight:600;}
+  .tagchip{font-size:.68rem; background:#0a2d26; color:var(--teal); border:1px solid #1e5f52; padding:2px 8px; border-radius:12px; margin-left:6px;}
+  .topbar-btns{margin-left:auto; display:flex; gap:8px; align-items:center;}
+  table.spec{width:100%; border-collapse:collapse; margin:12px 0;}
+  table.spec th{background:var(--panel2); color:var(--teal); font-size:.8rem; padding:8px; text-align:left; border:1px solid var(--line);}
+  table.spec td{border:1px solid var(--line); padding:7px 9px; font-size:.83rem; color:var(--dim);}
+  .step{border-left:3px solid var(--teal); margin:16px 0 16px 6px; padding:2px 0 2px 16px;}
+  .step h4{color:var(--teal); font-size:.92rem; margin-bottom:4px;}
+  .step p, .step li{font-size:.88rem; color:var(--dim); line-height:1.55;}
+  .verdict{display:inline-block; font-weight:700; font-size:.78rem; padding:2px 10px; border-radius:14px; margin-left:8px;}
+  .v-ok{background:#12301f; color:var(--good); border:1px solid #2e7d4f;}
+  .v-no{background:#301418; color:var(--bad); border:1px solid #7d2e2e;}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="vLogin">
+  <div class="login-box">
+    <span class="tag">UC • INTRODUÇÃO A ROBÓTICA</span>
+    <h1>Desafios de Especificação de Robôs</h1>
+    <p>Digite seu nome para entrar — seu progresso e pontuação ficam salvos nesta máquina. Ao final de cada trilha, uma insígnia. Nível: especialização. 😉</p>
+    <input id="inpNome" placeholder="Seu nome completo" maxlength="40" autocomplete="off">
+    <button class="btn big" id="btnEntrar">Entrar e começar ▸</button>
+    <div class="fb" id="fbLogin"></div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="vApp" style="display:none">
+  <header>
+    <span class="tag">UC • INTRODUÇÃO A ROBÓTICA</span>
+    <h1>Desafios de Especificação de Robôs</h1>
+    <div class="topbar-btns">
+      <button class="btn ghost" id="btnCatalogo">📚 Catálogo</button>
+      <button class="btn ghost" id="btnFormulas">📐 Fórmulas</button>
+      <button class="btn ghost" id="btnRanking">🏆 Ranking</button>
+      <div class="user"><div class="avatar" id="uAva"></div><span id="uNome"></span><span class="xp" id="uXp"></span></div>
+    </div>
+  </header>
+
+  <main id="hub">
+    <div class="banner">
+      <b style="color:var(--txt)">Como funciona:</b> consulte o <b style="color:var(--accent)">Catálogo</b> (como um manual real de fabricante),
+      use as <b style="color:var(--teal)">Fórmulas</b> quando precisar, resolva o <b style="color:var(--txt)">Exemplo Resolvido</b>
+      primeiro e depois avança pelas trilhas. Você tem <b style="color:var(--txt)">2 tentativas</b> por desafio —
+      leia bem os dados antes de responder: vários números são <b style="color:var(--txt)">armadilhas de leitura de manual</b>.
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>📖 Exemplo Resolvido</h3>
+        <p>Transferência de caixas: cálculo completo de carga útil, alcance 3D, repetibilidade, GDL e decisão final — passo a passo, como em um relatório técnico.</p>
+        <div class="bar"><i style="width:0%"></i></div>
+        <button class="btn" style="margin-top:10px" onclick="abrirExemplo()">Abrir exemplo ▸</button>
+      </div>
+
+      <div class="card">
+        <h3>🤖 Trilha A — Seleção de Robôs</h3>
+        <p>4 casos industriais. Analise o cenário, cruze com o catálogo e escolha o robô correto — justificando mentalmente cada eliminação.</p>
+        <div class="bar"><i id="barA"></i></div><div class="st" id="stA"></div>
+        <div class="badge-row"><span class="badge" id="bdA">🏅 Insígnia: Selecionador CR-4</span></div>
+        <button class="btn" style="margin-top:10px" onclick="iniciarTrilha('A')">Iniciar trilha ▸</button>
+      </div>
+
+      <div class="card">
+        <h3>🧮 Trilha B — Cálculo Aplicado</h3>
+        <p>Momento de carga, alcance 3D, tempo de ciclo e força de preensão: números de verdade, resposta numérica. Aproximação de lápis e calculadora.</p>
+        <div class="bar"><i id="barB"></i></div><div class="st" id="stB"></div>
+        <div class="badge-row"><span class="badge" id="bdB">🏅 Insígnia: Calculista de Manufatura</span></div>
+        <button class="btn" style="margin-top:10px" onclick="iniciarTrilha('B')">Iniciar trilha ▸</button>
+      </div>
+
+      <div class="card">
+        <h3>🧠 Trilha C — Diagnóstico Crítico</h3>
+        <p>Falhas reais, decisões de engenharia e dilemas de ética profissional. Não existe resposta "decoreba": é preciso raciocinar.</p>
+        <div class="bar"><i id="barC"></i></div><div class="st" id="stC"></div>
+        <div class="badge-row"><span class="badge" id="bdC">🏅 Insígnia: Engenheiro-resolvedor</span></div>
+        <button class="btn" style="margin-top:10px" onclick="iniciarTrilha('C')">Iniciar trilha ▸</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======= visão do exemplo resolvido ======= -->
+  <div id="vExemplo" style="display:none"></div>
+
+  <!-- ======= visão do desafio ======= -->
+  <div id="vDesafio" style="display:none"></div>
+</div>
+
+<!-- ===================== MODAL FEEDBACK ===================== -->
+<div class="modal-bg" id="mBg"><div class="modal" id="mBox"></div></div>
+
+<!-- ===================== DRAWERS ===================== -->
+<aside class="drawer" id="drCatalogo"></aside>
+<aside class="drawer" id="drFormulas"></aside>
+<aside class="drawer" id="drRanking"></aside>
+
+<script>
+/* =====================================================================
+   CATÁLOGO "KAIDO ROBOTICS 2026" — dados didáticos plausíveis de manual
+   ===================================================================== */
+const CATALOGO = [
+ {id:'kr1200', nome:'KR-6 AXIS 1200', tipo:'Articulado • 6 eixos', payload:12, alcance:'1,20 m', gdl:6,
+  repet:'±0,03 mm', ip:'IP54', vel:'2,0 m/s', massa:'150 kg', extra:'Montagem em piso. Uso geral em manufatura.'},
+ {id:'kr2050', nome:'KR-6 AXIS 2050', tipo:'Articulado • 6 eixos', payload:20, alcance:'2,05 m', gdl:6,
+  repet:'±0,05 mm', ip:'IP54', vel:'2,2 m/s', massa:'380 kg', extra:'Uso geral de médio porte. Alta rigidez.'},
+ {id:'scara600', nome:'KR-SCARA 600', tipo:'SCARA • 4 eixos', payload:6, alcance:'0,60 m (raio)', gdl:4,
+  repet:'±0,01 mm', ip:'IP40', vel:'3,0 m/s (ciclo padrão 0,45 s)', massa:'45 kg', extra:'Montagem em mesa/painel. Eixo Z de 150 mm.'},
+ {id:'delta900', nome:'KR-DELTA F900', tipo:'Delta (paralelo) • 3–4 eixos', payload:3, alcance:'0,90 m (diâmetro! raio 0,45 m)', gdl:'3–4',
+  repet:'±0,05 mm', ip:'IP65 (opção Wash IP69K)', vel:'até 180 ciclos/min (peça leve)', massa:'110 kg', extra:'Montagem suspensa (teto). Massas móveis mínimas.'},
+ {id:'cobot10', nome:'KR-COBOT CR-10', tipo:'Colaborativo • 6 eixos', payload:10, alcance:'1,30 m', gdl:6,
+  repet:'±0,05 mm', ip:'IP54 (opção Wash IP67)', vel:'1,0 m/s (colaborativo)', massa:'62 kg',
+  extra:'Sensores de força integrados • ISO/TS 15066 • operação descerreada após avaliação de risco formal.'},
+ {id:'pal80', nome:'KR-PAL 80', tipo:'Paletizador • 4 eixos', payload:80, alcance:'2,40 m', gdl:4,
+  repet:'±0,5 mm', ip:'IP54', vel:'1,8 m/s', massa:'700 kg', extra:'Pulso elevado de carga. Otimizado para paletização.'},
+ {id:'hd3500', nome:'KR-6 AXIS 3500 HD', tipo:'Articulado pesado • 6 eixos', payload:'200 kg (LC ≤ 120 mm) • momento máx. J3: 24 kgf·m', alcance:'3,50 m', gdl:6,
+  repet:'±0,2 mm', ip:'IP54 • versão Fundição IP67', vel:'1,0 m/s', massa:'2.000 kg', extra:'Grandes cargas. Verificar curva de momento de carga.'},
+ {id:'sprayex', nome:'KR-SPRAY EX', tipo:'Articulado ATEX • 6 eixos', payload:8, alcance:'1,55 m', gdl:6,
+  repet:'±0,1 mm', ip:'IP67 • ATEX Zona 1', vel:'1,5 m/s', massa:'240 kg', extra:'Certificado para atmosferas explosivas (pintura).'},
+];
+
+const FORMULAS = [
+ ['Carga útil mínima', 'm_u = (m_peça + m_garra) × 1,2', 'O robô precisa ter payload ≥ m_u. A margem de 20% cobre desbalanceamento, aceleração e desgaste.'],
+ ['Alcance (reach) 3D', 'R = √(x² + z²)  (+ margem de ~10% recomendada)', 'x = distância horizontal, z = altura do ponto mais distante da base do robô.'],
+ ['Momento de carga (centro de carga)', 'M = m × LC ≤ M_máx  →  m_máx = M_máx / LC', 'LC (Load Center) = distância do centro de massa da carga ao flange do robô. Payload nominal vale só para LC ≤ valor do manual!'],
+ ['Força de preensão (garra friccional)', 'F = (m × g / μ) × FS,  FS ≥ 2', 'μ = atrito garra-peça; FS = fator de segurança. Prender sem amassar é outro limite a verificar.'],
+ ['Tempo de ciclo', 't_c = (t_trajeto + t_manipulação + t_garra) / disponibilidade', 'produção/h = 3600 / t_c. Compare sempre com o takt time da linha.'],
+ ['Repetibilidade vs. processo', 'repetibilidade ≤ 1/3 da tolerância do processo', 'Se o processo exige ±0,6 mm, o robô deve repetir com ≤ ±0,2 mm (regra prática de engenharia).'],
+];
+
+/* =====================================================================
+   EXEMPLO RESOLVIDO
+   ===================================================================== */
+function htmlExemplo(){ return `
+<main>
+  <button class="btn ghost" onclick="voltarHub()">◂ Voltar ao painel</button>
+  <h2 style="color:var(--accent); margin:16px 0 4px">Exemplo Resolvido — Especificação de Robô</h2>
+  <p style="color:var(--dim); font-size:.87rem">Método: tarefa → números → catálogo → decisão. Use estes passos em todos os desafios.</p>
+
+  <div class="databox"><h4>Cenário (exemplo)</h4>
+    <li>Transferir <b>caixas de 8 kg</b> da esteira A para a paleta B;</li>
+    <li>Garra de pinça especial: <b>3,5 kg</b>;</li>
+    <li>Ponto mais distante: <b>1,25 m</b> na horizontal e <b>0,80 m</b> acima da base;</li>
+    <li>Tolerância do posicionamento: <b>±0,5 mm</b>; ambiente limpo (respingos ocasionais);</li>
+    <li>A peça deve girar <b>180°</b> entre pega e solta.</li></div>
+
+  <div class="step"><h4>Passo 1 — Carga útil mínima</h4>
+    <p>m = 8 + 3,5 = <b>11,5 kg</b> → com margem de 20%: m_u = 11,5 × 1,2 = <b>13,8 kg</b>.
+    <span class="verdict v-no">KR-1200 (12 kg) ✘</span> <span class="verdict v-ok">KR-2050 (20 kg) ✔</span></p></div>
+
+  <div class="step"><h4>Passo 2 — Alcance 3D</h4>
+    <p>R = √(1,25² + 0,80²) = √(1,5625 + 0,64) = √2,20 = <b>1,48 m</b> → +10% ≈ <b>1,63 m</b>.
+    <span class="verdict v-no">KR-1200 (1,20 m) ✘</span> <span class="verdict v-ok">KR-2050 (2,05 m) ✔</span></p></div>
+
+  <div class="step"><h4>Passo 3 — Repetibilidade</h4>
+    <p>Processo exige ±0,5 mm → robô precisa repetir com ≤ ±0,17 mm (1/3).
+    <span class="verdict v-ok">KR-2050: ±0,05 mm ✔ (folga confortável)</span></p></div>
+
+  <div class="step"><h4>Passo 4 — Graus de liberdade e ambiente</h4>
+    <p>Pegar, subir, girar 180° e soltar = <b>4 eixos bastam</b>; os 6 do KR-2050 sobram com folha de margem. Ambiente limpo → IP54 suficiente.</p></div>
+
+  <div class="step"><h4>Passo 5 — Decisão final</h4>
+    <p><b>KR-6 AXIS 2050</b> atende todos os critérios com folga. O KR-PAL 80 (2,40 m; 80 kg) também atenderia, mas é <b>supradimensionado</b> — engenharia também decide por <b>custo-benefício</b>.</p></div>
+
+  <div class="banner" style="border-left-color:var(--accent)">
+    <b style="color:var(--txt)">Quadro-decisão (repita esta tabela em cada desafio):</b>
+    <table class="spec"><tr><th>Critério</th><th>Exigência</th><th>KR-1200</th><th>KR-2050</th></tr>
+      <tr><td>Payload</td><td>≥ 13,8 kg</td><td>12 kg ✘</td><td>20 kg ✔</td></tr>
+      <tr><td>Alcance</td><td>≥ 1,63 m</td><td>1,20 m ✘</td><td>2,05 m ✔</td></tr>
+      <tr><td>Repetibilidade</td><td>≤ ±0,17 mm</td><td>±0,03 mm ✔</td><td>±0,05 mm ✔</td></tr>
+      <tr><td>GDL</td><td>≥ 4</td><td>6 ✔</td><td>6 ✔</td></tr>
+      <tr><td>IP</td><td>IP54</td><td>IP54 ✔</td><td>IP54 ✔</td></tr>
+      <tr><td style="border-right:none">Custo-benefício</td><td>suficiente</td><td>✔ (mas falha nos outros)</td><td>✔ equilibrado</td></tr></table>
+  </div>
+  <button class="btn big" onclick="voltarHub()">Entendi o método — para as trilhas! ▸</button>
+</main>`; }
+
+/* =====================================================================
+   DESAFIOS — 12 casos de nível especialização
+   ===================================================================== */
+const DESAFIOS = {
+/* ---------------- TRILHA A — SELEÇÃO ---------------- */
+A1:{t:'A1 · Paletização pesada', xp:100,
+ en:'Uma célula nova de paletização de papelão: cada caixa tem <b>18 kg</b>; a garra de pinça especial pesa <b>8 kg</b>. O ponto mais distante da base do robô fica a <b>2,15 m</b> na horizontal (altura desprezível), o posicionamento exigido é de <b>±2 mm</b> e o ambiente tem apenas respingos ocasionais de água nas higienizações.',
+ dados:['Caixa: 18 kg','Garra: 8 kg','Alcance necessário: 2,15 m','Repetibilidade do processo: ±2 mm','Ambiente: IP54 suficiente'],
+ pq:'Qual robô do catálogo você especifica para esta célula?',
+ tipo:'mc', opts:[
+  {t:'KR-6 AXIS 1200', correta:false, fb:'Dois reproves no checklist: payload (18+8)×1,2 = <b>31,2 kg</b> ≫ 12 kg, e alcance 1,20 m &lt; 2,15 m.'},
+  {t:'KR-6 AXIS 2050', correta:false, fb:'Reprova em payload: 31,2 kg ≫ 20 kg — e também no alcance (2,05 m &lt; 2,15 m). Ler os números até o fim evita erro de especificação.'},
+  {t:'KR-PAL 80', correta:true, fb:'✔ Payload 80 kg ≥ 31,2 kg; alcance 2,40 m ≥ 2,15 m + margem; repetibilidade ±0,5 mm ≤ 0,67 mm (1/3 da tolerância); 4 eixos bastam para paletizar; IP54 ok. Paletizador dedicado — solução enxuta.'},
+  {t:'KR-6 AXIS 3500 HD', correta:false, fb:'Tecnicamente atende, mas é <b>supradimensionado</b>: ~3× o custo, 200 kg de payload para 31,2 kg e 6 eixos para uma tarefa de 4. Parte do trabalho do especificador é eliminar desperdício.'},
+  {t:'KR-COBOT CR-10', correta:false, fb:'Payload 10 kg ≪ 31,2 kg. E paletização não precisa de colaboração aqui — sem vale o sobre-custo de sensores de força.'}],
+ res:'m_u = (18+8)×1,2 = 31,2 kg → PAL 80. Checklist completo: payload ✔ alcance ✔ repetibilidade ✔ GDL ✔ IP ✔ custo ✔.'},
+
+A2:{t:'A2 · Montagem eletrônica', xp:100,
+ en:'Linha de eletrônicos: módulos de <b>90 g</b>, manipulados por ventosa de <b>70 g</b>. O ponto mais distante fica a <b>520 mm</b> do centro do robô. A linha requer <b>1 peça por segundo (3.600/h)</b> e tolerância de ±0,05 mm. Ambiente de sala limpa.',
+ dados:['Peça + ventosa: 0,16 kg → m_u ≈ 0,19 kg','Alcance: 520 mm','Ciclo: 1 s/peça','Tolerância ±0,05 mm'],
+ pq:'Qual robô atende <b>todos</b> os requisitos da linha?',
+ tipo:'mc', opts:[
+  {t:'KR-SCARA 600', correta:true, fb:'✔ Payload 6 kg ≫ 0,19 kg; raio 0,60 m &gt; 520 mm; repetibilidade ±0,01 mm (≤ 1/3 de 0,05); ciclo padrão 0,45 s &lt; 1 s. Escolha clássica de eletrônica.'},
+  {t:'KR-DELTA F900', correta:false, fb:'Armadilha de manual: o alcance do delta é <b>diâmetro</b> (0,90 m) → raio útil de <b>0,45 m &lt; 520 mm</b>. Ele não alcança o ponto mais distante. Sempre confirme se o manual informa raio ou diâmetro!'},
+  {t:'KR-COBOT CR-10', correta:false, fb:'No papel o alcance cabe, mas: repetibilidade ±0,05 mm fica <b>no limite</b> da tolerância (regra 1/3), velocidade de colaborativo (~1 m/s) não sustenta 1 ciclo/s e o custo é ~3× o SCARA. Razoável não é suficiente.'},
+  {t:'KR-6 AXIS 1200', correta:false, fb:'Supradimensionado: 6 eixos, IP54, 12 kg de payload e manutenção mais cara para manipular 90 g. O ciclo também fica marginal.'}],
+ res:'Checklist: payload ✔ (6 kg ≫ 0,19), alcance ✔ (0,60 &gt; 0,52), repetibilidade ✔ (0,01 ≤ 0,017), ciclo ✔ (0,45 &lt; 1). Resposta: KR-SCARA 600.'},
+
+A3:{t:'A3 · Fundição pesada', xp:100,
+ en:'Em uma fundição de alumínio, o robô retirará peças de <b>65 kg</b> com uma garra mecânica de <b>15 kg</b>, a <b>2,10 m</b> da base. O ambiente tem <b>respingos de metal fundido e calor</b>, e a célula não pode ter operador dentro dela.',
+ dados:['Peça 65 kg + garra 15 kg → m_u = 96 kg','Alcance ≥ 2,10 m (+margem)','Atmosfera: respingos de metal + contato térmico','Célula completamente isolada do operador'],
+ pq:'Qual especificação é tecnicamente correta e segura?',
+ tipo:'mc', opts:[
+  {t:'KR-6 AXIS 3500 HD versão Fundição (IP67)', correta:true, fb:'✔ 200 kg ≥ 96 kg; 3,50 m ≥ 2,31 m (2,10 + 10%); IP67 Foundry contra respingos de metal; célula isolada dispensa colaboração. Solução robusta para o ambiente.'},
+  {t:'KR-6 AXIS 2050', correta:false, fb:'Payload 20 kg ≪ 96 kg e IP54 não suporta respingos de metal fundido (a versão IP67 Foundry não consta neste modelo). Três reproves conceituais.'},
+  {t:'KR-PAL 80', correta:false, fb:'Payload 80 kg &lt; 96 kg exigidos — sem margem, o robô operará no limite. E paletizadores têm requisitos próprios (carga centrada, movimentos repetidos) que essa tarefa não oferece.'},
+  {t:'KR-SPRAY EX', correta:false, fb:'Atex/Zona 1 é para <b>atmosferas explosivas de pintura</b> — não é o problema de uma fundição (que pede IP contra respingos e temperatura). Payload 8 kg é muito abaixo do necessário.'},
+  {t:'KR-COBOT CR-10', correta:false, fb:'Pensamento crítico: <b>cobot + metal fundido = risco grave e proibido pela ISO/TS 15066</b> (não resolve perigos térmicos) e payload 10 kg ≪ 96 kg. Colaboração não é solução universal.'}],
+ res:'Exige-se: payload ≥ 96 kg + IP67 Fundição + célula isolada → KR-3500 HD versão Fundição. Ambiente elimina cobot e IP54; payload elimina os demais.'},
+
+A4:{t:'A4 · Cobot na linha de alimentos', xp:100,
+ en:'Embalagem de queijos: produtos de <b>1,2 kg</b>, garra lavável de <b>3,0 kg</b>, ponto a <b>1,05 m</b> da base, ciclo de <b>2 s</b>. A operadora trabalha <b>na mesma bancada</b> (cercas inviáveis por layout) e a higienização é <b>diária</b>, com água e vapor.',
+ dados:['m_u = (1,2+3,0)×1,2 = 5,04 kg','Alcance ≥ 1,05 m','Colaboração obrigatória (sem cerca)','IP para higienização diária','Ciclo 2 s'],
+ pq:'Qual robô você especifica?',
+ tipo:'mc', opts:[
+  {t:'KR-COBOT CR-10 versão Wash', correta:true, fb:'✔ Colaborativo certificado (ISO/TS 15066) → opera sem cerca; IP67 Wash → higienização diária; 10 kg ≥ 5,04; 1,30 m &gt; 1,16 m; ciclo coberto pela velocidade reduzida em tarefa de 2 s.'},
+  {t:'KR-SCARA 600', correta:false, fb:'IP40 = nada contra lavagem e ainda sem certificação colaborativa → exigiria cerco. Reprova em ambiente e em segurança.'},
+  {t:'KR-6 AXIS 2050', correta:false, fb:'Robô industrial convencional: <b>exige cerca</b> (não é colaborativo) e IP54 insuficiente para higienização diária. Duas reproves duros.'},
+  {t:'KR-DELTA F900 Wash', correta:false, fb:'Tem IP69K, mas raio útil 0,45 m ≪ 1,16 m exigidos e montagem de teto. Nem com Wash salva a geometria.'}],
+ res:'Não é só "escolher robô": é escolher <b>norma + ambiente + geometria</b>. CR-10 Wash é o único que atende os quatro eixos do checklist.'},
+
+/* ---------------- TRILHA B — CÁLCULO ---------------- */
+B1:{t:'B1 · Centro de carga', xp:110,
+ en:'O manual do <b>KR-6 AXIS 3500 HD</b> informa: payload nominal de 200 kg com centro de carga <b>LC ≤ 120 mm</b> do flange; <b>momento de carga máximo no eixo J3: 24 kgf·m</b>. Sua peça tem centro de massa a <b>LC = 200 mm</b> do flange.',
+ dados:['M_máx = 24 kgf·m','LC da peça = 200 mm (0,2 m)'], fórmula:'M = m × LC → m_máx = M_máx / LC',
+ pq:'Qual a <b>massa máxima (kg)</b> da peça admissível com LC = 200 mm? (1 casa decimal)',
+ tipo:'num', resp:120, tol:0.5, un:'kg',
+ res:'m_máx = 24 / 0,2 = <b>120 kg</b>. Sua peça de 150 kg gera momento 150 × 0,2 = 30 kgf·m &gt; 24 → alarme de sobrecarga ou falha prematura de eixo. Dica de projeto: em produção, aplique ~90% desse valor (≈ 108 kg) como margem de engenharia.'},
+
+B2:{t:'B2 · Alcance 3D', xp:110,
+ en:'Robô fixo no chão, no centro da célula. A peça mais distante está a <b>1,80 m</b> na horizontal e <b>1,50 m</b> de altura, em relação à base.',
+ dados:['x = 1,80 m','z = 1,50 m'], fórmula:'R = √(x² + z²)',
+ pq:'Qual o <b>alcance mínimo (m)</b> que o robô precisa ter, com 2 casas decimais?',
+ tipo:'num', resp:2.34, tol:0.02, un:'m',
+ res:'R = √(1,8² + 1,5²) = √(3,24 + 2,25) = √5,49 = <b>2,34 m</b>. No catálogo: KR-PAL 80 (2,40 m) atende por apenas 2,5% — sem margem de 10%; KR-3500 HD (3,50 m) dá folga com custo alto. Discussão de engenharia: existe peça intermediária? Cabe mudar o layout em vez de pagar o HD?'},
+
+B3:{t:'B3 · Ciclo e produção', xp:110,
+ en:'Um KR-SCARA 600 transfere componentes: percurso do TCP por peça <b>0,90 m</b> a velocidade média de <b>0,25 m/s</b>; manipulação/frenagem soma <b>0,8 s</b>; abertura/fechamento de garra <b>0,4 s</b>. A disponibilidade do sistema é <b>90%</b>.',
+ dados:['Trajeto: 0,90 m a 0,25 m/s','Manipulação: 0,8 s','Garra: 0,4 s','Disponibilidade: 90%'],
+ fórmula:'t_c = (t_trajeto + t_manip + t_garra)/disponibilidade → produção/h = 3600 / t_c',
+ pq:'Quantas <b>peças por hora</b> o sistema produz? (inteiro)',
+ tipo:'num', resp:675, tol:5, un:'peças/h',
+ res:'t_c = (3,6 + 0,8 + 0,4)/0,9 = 4,8/0,9 = <b>5,33 s</b> → 3600/5,33 = <b>675 peças/h</b>. Se a meta fosse 800/h, falta capacidade: aumenta-se velocidade, encurta-se o percurso ou duplica-se o robô. Dimensione o ciclo pelo takt antes de comprar o robô.'},
+
+B4:{t:'B4 · Força de preensão', xp:110,
+ en:'Garra de pinça paralela com atrito μ = <b>0,30</b> segurando uma peça de <b>2,5 kg</b>. Aplica-se fator de segurança <b>FS = 2</b> (acelerações e choques).',
+ dados:['m = 2,5 kg','μ = 0,30','FS = 2','g = 9,81 m/s²'],
+ fórmula:'F = (m × g / μ) × FS',
+ pq:'Qual a <b>força de preensão total (N)</b> esperada? (1 casa decimal)',
+ tipo:'num', resp:163.5, tol:2, un:'N',
+ res:'F = (2,5 × 9,81 / 0,30) × 2 = (24,525/0,3) × 2 = 81,75 × 2 = <b>163,5 N</b>. Verificação crítica: essa força não amassa a peça? Para frágeis, troca-se o revestimento (aumenta μ) ou migra-se para pega por forma/vácuo.'},
+
+/* ---------------- TRILHA C — DIAGNÓSTICO ---------------- */
+C1:{t:'C1 · Repetibilidade degradada', xp:120,
+ en:'Um KR-6 AXIS 1200 com 18 meses de operação especifica repetibilidade de ±0,03 mm, mas a medição da célula aponta <b>±0,28 mm</b>. Programas e acessórios foram conferidos. <b>Selecione TODAS as hipóteses plausíveis</b> que explicam a degradação:',
+ dados:['Especificação: ±0,03 mm','Medição atual: ±0,28 mm','Sem colisões registradas'],
+ pq:'Quais hipóteses você investigaria primeiro?',
+ tipo:'multi', opts:[
+  {t:'Parafusos de fixação da base frouxos', correta:true, fb:'✔ Causa clássica: barata e rápida de checar, degrada exatamente o que se observa, causada por vibração acumulada.'},
+  {t:'Desgaste interno do redutor harmônico (backlash)', correta:true, fb:'✔ Redutores degradam com tempo/carga; a folga nasce gradualmente e se revela na repetibilidade.'},
+  {t:'Garra nova desbalanceada, gerando vibração no fim do movimento', correta:true, fb:'✔ Carga mal centrada excita vibração e ultrapassagem no posicionamento — afeta a variação de parada.'},
+  {t:'O robô envelheceu: planejar a troca imediata do robô', correta:false, fb:'✘ Antes de gastar, diagnostique. Trocar a máquina sem causa identificada é desperdício — visão sistêmica.'},
+  {t:'Aumentar a folga das tolerâncias dos programas para mascarar o erro', correta:false, fb:'✘ Isso é máscara, não solução: compromete a qualidade do produto e esconde uma falha mecânica em progressão. Falha ética e técnica.'}],
+ res:'Investiga-se em ordem de custo: fixação (5 min) → vibração pela garra (medição) → backlash dos redutores (diagnóstico de fabricante). Melhoria contínua é eliminatória de hipóteses, não adivinhação.'},
+
+C2:{t:'C2 · Por que o delta voa?', xp:120,
+ en:'Um aluno pergunta: "por que o KR-DELTA F900 faz <b>180 ciclos/min</b> com 3 g e o KR-6 AXIS 1200, com o mesmo tipo de carga, não passa de ~40/min?" Qual a explicação <b>fundamental</b>?',
+ dados:['Delta: braços leves, motores fixos na estrutura','Articulado: braço carrega os motores dos eixos seguintes'],
+ pq:'O que determina essa diferença de desempenho?',
+ tipo:'mc', opts:[
+  {t:'Massa móvel reduzida → menor inércia e torque necessários (F = m·a, T = I·α)', correta:true, fb:'✔ No delta, os motores pesados ficam <b>parados</b> na estrutura e os braços são leves → a inércia movida é mínima. Física de verdade: menos massa e menor I = mais aceleração com o mesmo torque.'},
+  {t:'O delta usa motores mais potentes que o articulado', correta:false, fb:'✘ É o contrário: motores <b>menores</b> bastam no delta — porque a inércia movida é pequena.'},
+  {t:'Por ser montado no teto, ele aproveita a gravidade', correta:false, fb:'✘ Montagem suspensa afeta o volume de trabalho e a pegada, não a aceleração. O delta desce tanto quanto sobe rápido.'},
+  {t:'Por ter 3 eixos em vez de 6, é mecanicamente 2× mais rápido', correta:false, fb:'✘ Menos eixos ajuda, mas o fator dominante é a <b>inércia reduzida das massas móveis</b>. Um SCARA de 4 eixos também é rápido; um delta de 4 não perde velocidade por isso.'}],
+ res:'Conceito-chave da UC: <b>inércia</b>. Reduzir massa móvel (motores na base, braços leves) multiplica a capacidade de aceleração — é assim que o delta domina picking a 4 g.'},
+
+C3:{t:'C3 · Ética sob pressão de custo', xp:120,
+ en:'Em uma célula com o <b>KR-6 AXIS 1200</b> (robô convencional, não colaborativo) rodeada por scanner de área de segurança, o gestor pede: "desativa o scanner e a cerca para economizar 15% no projeto; a gente treina o pessoal". Você é o técnico responsável pelo projeto. O que fazer?',
+ dados:['Robô industrial convencional (não é cobot)','Scanner de área é a única proteção','Pedido do gestor: retirar segurança'],
+ pq:'Decisão tecnicamente correta e eticamente aceitável:',
+ tipo:'mc', opts:[
+  {t:'Desativar a proteção e reduzir a velocidade do robô pela metade', correta:false, fb:'✘ Redução de velocidade <b>não substitui</b> proteção para robô convencional: sem scanner/cerca não há separação de tarefas. A ISO/TS 15066 vale para robôs <b>certificados colaborativos</b> — não é o caso. Risco de acidente grave e responsabilidade técnica sua.'},
+  {t:'Recusar por escrito e propor alternativas: demarcar área + reorganizar o layout ou avaliar um cobot certificado', correta:true, fb:'✔ Postura do especialista: <b>ética não improvisada</b> — registro da recusa, justificativa técnica e alternativa construtiva. Segurança não é item dispensável do orçamento; quem coloca a mão é o trabalhador.'},
+  {t:'Aceitar, pois a decisão de custos é do gestor', correta:false, fb:'✘ Responsabilidade civil e moral do técnico: a decisão técnica de segurança não pode ser terceirizada para quem não domina o risco. "Eu só executei" já não se sustenta em auditorias.'},
+  {t:'Aceitar agora e reinstalar a cerca no próximo semestre', correta:false, fb:'✘ "Risco temporário" vira permanente: um acidente no intervalo mata — e termina a carreira de quem autorizou. Juridicamente, o projeto segue com a falha conhecida.'}],
+ res:'Capacidade socioemocional do plano de curso em ação: <b>ética, consciência prevencionista e proatividade</b>. Recusa documentada + alternativa técnica = solução adulta.'},
+
+C4:{t:'C4 · Singularidade na trajetória', xp:120,
+ en:'O KR-6 AXIS 2050 executa uma <b>trajetória linear</b> de aplicação de adesivo e, num trecho, o painel HMI acusa <b>erro de percurso</b> e o robô entra em parada de emergência: duas juntas tentam girar quase 90° de uma vez. O trecho fica <b>perto da borda do volume de trabalho</b>, com o punho quase totalmente esticado.',
+ dados:['Movimento: linear (CP)','Erro: "path error" em trecho único','Região: punho quase alinhado, braço quase esticado'],
+ pq:'Qual o diagnóstico e a ação de engenharia correta?',
+ tipo:'mc', opts:[
+  {t:'Singularidade (punho/braço quase esticado) — deslocar o ponto problemático fora da singularidade, ajustar a orientação do TCP ou usar movimento articular nesse trecho', correta:true, fb:'✔ Perto do volume/singularidade, a cinemática inversa exige velocidades absurdas das juntas para segurar o TCP no percurso linear. Robôs reais: <b>reprogramar o ponto, mudar orientação ou migrar o trecho para joint move</b> — quando o percurso linear exato não é exigido ali.'},
+  {t:'Trocar o servo do eixo 2 por um de maior potência', correta:false, fb:'✘ O motor é saudável: quem pede esforço desmedido é a <b>geometria</b> da trajetória. Causa não é elétrica.'},
+  {t:'Aumentar a velocidade do programa para atravessar rápido o trecho', correta:false, fb:'✘ Agrava o problema: mais velocidade = mais esforço no mesmo ponto crítico. O erro é espacial, não temporal.'},
+  {t:'Refazer toda a célula em ponto a ponto (PTP), perdendo a qualidade do cordão', correta:false, fb:'✘ Perde-se o controle do percurso onde ele importa (aplicação de adesivo). A leitura certa é local, não global.'}],
+ res:'Conceito-chave: <b>pontos singulares</b> — configurações em que a inversa descontrola velocidade de juntas. O especificador evita projetar a célula que "vive na borda" do volume de trabalho.'},
+};
+
+/* ================= ESTADO E PERSISTÊNCIA ================= */
+let perfil=null, desafioAtual=null, tentativaAtual=0;
+const LS='rcp_alunos_v1';
+
+function carregarAlunos(){ try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return{}} }
+function salvar(){ const todos=carregarAlunos(); todos[perfil.nome]=perfil; localStorage.setItem(LS,JSON.stringify(todos)); }
+
+function entrar(){
+  const nome=document.getElementById('inpNome').value.trim();
+  if(nome.length<3){ const f=document.getElementById('fbLogin'); f.className='fb show no';
+    f.textContent='Digite pelo menos 3 caracteres para entrar.'; return; }
+  const todos=carregarAlunos();
+  const volta=!!todos[nome];
+  perfil = volta ? todos[nome] : {nome, xp:0, tentativas:{}, stats:{}};
+  salvar();
+  document.getElementById('vLogin').style.display='none';
+  document.getElementById('vApp').style.display='block';
+  document.getElementById('uNome').textContent=nome.split(' ')[0]+(volta?' (de volta!)':'');
+  document.getElementById('uAva').textContent=nome[0].toUpperCase();
+  renderHub(); renderCatalogo(); renderFormulas(); renderRanking();
+}
+
+/* ================= RENDER: HUB ================= */
+function porTrilha(t){ return DESAFIOS && Object.keys(DESAFIOS).filter(k=>k[0]===t) }
+function feitas(t){ return porTrilha(t).filter(k=>perfil.tentativas[k]>=1).length }
+function renderHub(){
+  document.getElementById('uXp').textContent=perfil.xp+' XP';
+  for(const t of ['A','B','C']){
+    const n=feitas(t), total=porTrilha(t).length;
+    document.getElementById('bar'+t).style.width=(n/total*100)+'%';
+    document.getElementById('st'+t).textContent=n+' de '+total+' desafios concluídos';
+    document.getElementById('bd'+t).className='badge'+(n===total?' on':'');
+  }
+}
+function voltarHub(){
+  document.getElementById('vDesafio').style.display='none';
+  document.getElementById('vExemplo').style.display='none';
+  document.getElementById('hub').style.display='block';
+  renderHub();
+}
+function abrirExemplo(){
+  document.getElementById('hub').style.display='none';
+  const v=document.getElementById('vExemplo'); v.style.display='block'; v.innerHTML=htmlExemplo();
+}
+function iniciarTrilha(t){
+  const ks=porTrilha(t);
+  const pendente=ks.find(k=>!perfil.tentativas[k]);
+  abrirDesafio(pendente || ks[0]);
+}
+
+/* ================= RENDER: DESAFIO ================= */
+function abrirDesafio(k){
+  desafioAtual=k; tentativaAtual=(perfil.tentativas[k]||0); // 1 = já usou 1ª
+  const d=DESAFIOS[k];
+  document.getElementById('hub').style.display='none';
+  document.getElementById('vExemplo').style.display='none';
+  const v=document.getElementById('vDesafio'); v.style.display='block';
+
+  let corpo='';
+  if(d.tipo==='mc' || d.tipo==='multi'){
+    const multi=d.tipo==='multi';
+    corpo=d.opts.map((o,i)=>`
+      <label class="opt" id="opt${i}">
+        <input type="${multi?'checkbox':'radio'}" name="resp" value="${i}"
+          ${multi?'':'onclick="selecionar(this.value)"'}><span>${o.t}</span></label>`).join('');
+    corpo+=`<button class="btn" id="btnResp" onclick="responder()">Responder ✔</button>
+            <button class="btn ghost" onclick="voltarHub()">◂ Painel</button>`;
+  }else{
+    corpo=`<div style="margin:12px 0 4px">
+        <input type="text" inputmode="decimal" id="inpNum" style="max-width:220px" autocomplete="off" placeholder="ex.: 2,34"><span class="unit">${d.un}</span></div>
+      <button class="btn" id="btnResp" onclick="responder()">Responder ✔</button>
+      <button class="btn ghost" onclick="voltarHub()">◂ Painel</button>`;
+  }
+
+  v.innerHTML=`<button class="btn ghost" onclick="voltarHub()">◂ Voltar ao painel</button>
+    <h2 style="color:var(--accent); margin:14px 0 2px">${d.t}</h2>
+    <div style="color:var(--dim); font-size:.82rem; margin-bottom:12px">
+      ${tentativaAtual===1?'⚠️ <b>2ª (e última) tentativa com XP — vale metade! ':''}${tentativaAtual>=2?'🔒 Tentativas esgotadas — vale 0 XP, use para estudar a resolução. ':''}XP em jogo: <b style="color:var(--accent)">${xpDisponivel()}</b></div>
+    <div class="stmt">${d.en}</div>
+    <div class="databox"><h4>📋 Dados fornecidos</h4>${d.dados.map(x=>'<li>'+x+'</li>').join('')}</div>
+    ${d.fórmula?`<div class="banner">📐 <b style="color:var(--teal)">Fórmula:</b> ${d.fórmula}</div>`:''}
+    <div class="faq">❓ ${d.pq}</div>
+    ${corpo}`;
+}
+
+function selecionar(i){
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  document.getElementById('opt'+i).classList.add('sel');
+}
+function xpDisponivel(){ const t=tentativaAtual; return t===0 ? DESAFIOS[desafioAtual].xp : (t===1 ? DESAFIOS[desafioAtual].xp/2 : 0); }
+
+function responder(){
+  const d=DESAFIOS[desafioAtual];
+  let ok=false, fb='';
+  if(d.tipo==='num'){
+    const v=parseFloat(String(document.getElementById('inpNum').value).replace(',','.'));
+    if(isNaN(v)){ mostrarModal(false,'<b>Digite um número.</b>'); return; }
+    ok=Math.abs(v-d.resp)<=d.tol;
+  }else if(d.tipo==='multi'){
+    const sel=[...document.querySelectorAll('.opt input:checked')].map(i=>+i.value);
+    if(!sel.length){ mostrarModal(false,'<b>Selecione ao menos uma hipótese.</b>'); return; }
+    const certas=[0,1,2], faltam=certas.filter(c=>!sel.includes(c)), sobram=sel.filter(s=>!certas.includes(s));
+    ok=!faltam.length && !sobram.length;
+  }else{
+    const sel=document.querySelector('.opt input:checked');
+    if(!sel){ mostrarModal(false,'<b>Selecione uma opção.</b>'); return; }
+    ok=+sel.value===d.opts.findIndex(o=>o.correta);
+  }
+
+  perfil.tentativas[desafioAtual]=tentativaAtual+1;
+  if(ok) perfil.xp += xpDisponivel();
+  salvar();
+
+  const pontos=ok
+    ? `<b style="color:var(--good)">✔ Resposta correta! +${xpDisponivel()} XP</b>`
+    : (tentativaAtual===0 ? '<b style="color:var(--bad)">✘ Não é isso.</b> A 2ª (e última) tentativa vale metade do XP — releia os dados com calma.'
+                          : '<b style="color:var(--bad)">✘ As duas tentativas acabaram.</b> Estude a resolução completa abaixo e siga — aprender vale mais que o XP.');
+  let corpo=`<p style="font-size:1.02rem; margin-bottom:10px">${pontos}</p>`;
+  if(d.opts) corpo+=d.opts.map((o,i)=>{
+    const marcar = (d.corretaIdx!==undefined?i===d.corretaIdx:o.correta)?'✔ <b style="color:var(--good)">CORRETA</b><br>':'✘ <b style="color:var(--bad)">eliminada</b><br>';
+    const esc=(o.correta||[...document.querySelectorAll('.opt input:checked')].map(x=>+x.value).includes(i))?'':'';
+    return `<div style="font-size:.84rem; border-bottom:1px dashed var(--line); padding:8px 0">
+      ${marcar}<b style="color:var(--txt)">${o.t}</b><br>${o.fb||''}</div>`;}).join('');
+  mostrarModal(ok, `<h2 style="color:${ok?'var(--good)':'var(--bad)'}; font-size:1.1rem; margin-bottom:10px">${ok?'Correto! 🎯':'Feedback do desafio'}</h2>${corpo}
+    <div class="banner" style="border-left-color:var(--teal)"><b style="color:var(--teal)">🔧 Resolução / raciocínio:</b><br>${d.res}</div>
+    <button class="btn" onclick="proximo()">Continuar ▸</button>`);
+}
+
+function proximo(){
+  fecharModal();
+  const t=desafioAtual[0];
+  const pendente=porTrilha(t).find(k=>!perfil.tentativas[k]);
+  if(pendente){ abrirDesafio(pendente); return; }
+  voltarHub();
+}
+
+/* ================= MODAL ================= */
+function mostrarModal(ok,html){ document.getElementById('mBox').innerHTML=html; document.getElementById('mBg').style.display='flex';
+  document.getElementById('mBox').className='modal'+(ok?' ok':''); }
+function fecharModal(){ document.getElementById('mBg').style.display='none'; }
+document.getElementById('mBg').addEventListener('click',e=>{ if(e.target.id==='mBg') fecharModal(); });
+
+/* ================= DRAWERS ================= */
+function toggleDrawer(id){
+  ['drCatalogo','drFormulas','drRanking'].forEach(x=>{
+    const el=document.getElementById(x); el.classList.toggle('open', x===id && !el.classList.contains('open'));
+  });
+}
+document.getElementById('btnCatalogo').onclick=()=>toggleDrawer('drCatalogo');
+document.getElementById('btnFormulas').onclick=()=>toggleDrawer('drFormulas');
+document.getElementById('btnRanking').onclick=()=>toggleDrawer('drRanking');
+
+function renderCatalogo(){
+  document.getElementById('drCatalogo').innerHTML=`
+    <div style="display:flex; align-items:center"><h2 style="color:var(--accent); font-size:1rem">📚 Catálogo Kaido Robotics 2026</h2>
+    <button class="btn ghost" style="margin-left:auto" onclick="toggleDrawer('drCatalogo')">✖</button></div>
+    <p style="color:var(--dim); font-size:.76rem; margin:6px 0 10px">Material didático com valores típicos de mercado. Consulte durante os desafios — como se consultaria o manual real.</p>
+    ${CATALOGO.map(r=>`<div class="robot-card"><h4>${r.nome}<span class="tagchip">${r.tipo}</span></h4>
+      <table><tr><td>Payload nominal</td><td>${r.payload}</td></tr>
+      <tr><td>Alcance</td><td>${r.alcance}</td></tr>
+      <tr><td>Graus de liberdade</td><td>${r.gdl}</td></tr>
+      <tr><td>Repetibilidade</td><td>${r.repet}</td></tr>
+      <tr><td>Proteção</td><td>${r.ip}</td></tr>
+      <tr><td>Velocidade / ciclo</td><td>${r.vel}</td></tr>
+      <tr><td>Massa do robô</td><td>${r.massa}</td></tr>
+      <tr><td>Observações</td><td>${r.extra}</td></tr></table></div>`).join('')}`;
+}
+function renderFormulas(){
+  document.getElementById('drFormulas').innerHTML=`
+    <div style="display:flex; align-items:center"><h2 style="color:var(--teal); font-size:1rem">📐 Fórmulas de especificação</h2>
+    <button class="btn ghost" style="margin-left:auto" onclick="toggleDrawer('drFormulas')">✖</button></div>
+    ${FORMULAS.map(f=>`<div class="robot-card"><h4 style="color:var(--teal)">${f[0]}</h4>
+      <p style="font-size:.86rem; color:var(--gold); margin:6px 0; font-family:Consolas,monospace">${f[1]}</p>
+      <p style="font-size:.8rem">${f[2]}</p></div>`).join('')}`;
+}
+function renderRanking(){
+  const todos=Object.values(carregarAlunos()).sort((a,b)=>b.xp-a.xp);
+  document.getElementById('drRanking').innerHTML=`
+    <div style="display:flex; align-items:center"><h2 style="color:var(--gold); font-size:1rem">🏆 Ranking de especificadores</h2>
+    <button class="btn ghost" style="margin-left:auto" onclick="toggleDrawer('drRanking')">✖</button></div>
+    <p style="color:var(--dim); font-size:.76rem; margin:6px 0 10px">Pontuações dos alunos que usaram esta máquina.</p>
+    ${todos.map((p,i)=>`<div class="robot-card" style="${p.nome===perfil?.nome?'border-color:var(--accent)':''}">
+      <b>${['🥇','🥈','🥉'][i]||('#'+(i+1))} ${p.nome}</b>
+      <span style="float:right; color:var(--accent); font-weight:700">${p.xp} XP</span></div>`).join('')}`;
+}
+
+document.getElementById('btnEntrar').onclick=entrar;
+document.getElementById('inpNome').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
+/* índices corretos para modo mc (usado no feedback) */
+Object.entries(DESAFIOS).forEach(([k,d])=>{ if(d.tipo==='mc') d.corretaIdx=d.opts.findIndex(o=>o.correta); });
+</script>
+</body>
+</html>
